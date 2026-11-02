@@ -1,0 +1,186 @@
+// #include Arduino.h
+// base tutorial adapted from https://esp32io.com/tutorials/esp32-traffic-light
+
+// # constants
+// traffic light pins
+#define PIN_RED    18 // The ESP32 pin GPIO18 connected to R pin of traffic light module
+#define PIN_YELLOW 21 // The ESP32 pin GPIO21 connected to Y pin of traffic light module
+#define PIN_GREEN  22 // The ESP32 pin GPIO22 connected to G pin of traffic light module
+
+// buzzer pin (to-do: add button pin)
+#define PIN_BUZZER 19
+
+// constant timers (in milliseconds)
+#define RED_TIME     15000 // RED phase
+#define YELLOW_TIME  4000 // YELLOW phase
+#define GREEN_TIME   20000 // GREEN phase
+
+#define FLASH_TIME   500
+
+#define RAPID_BUZZER 150
+#define NORM_BUZZER  500
+
+// global current phase (for state machine tracking)
+int currentPhase = 4; // tracks current phase (0=red,1=yellow,2=green)
+int invalidFallback = false; // if current phase is invalid, turn off all pins and move to default switch case
+bool isPrimarySignal = true; // signal type identifier (0/false=arterial, 1/true=primary)
+
+// global timestamps (for millis)
+unsigned long greenStartedAt = 0;
+unsigned long yellowStartedAt = 0;
+unsigned long redStartedAt = 0;
+
+unsigned long flashStartedAt = 0; // redundant to make separate flash variables for the same amount of time
+// unsigned long buzzerStartedAt;
+// bool isBuzzing = false;
+
+// # function declarations
+void phaseRed();
+void phaseYellow();
+void phaseGreen();
+
+// void flashYellow(); // redundant, can just use phaseYellow and phaseRed with repurposed timers
+// void flashRed();
+// void flashGreen(); // used in international signals to warn a green light phase is ending (e.g. Saudi Arabia)
+
+void buzzerPing(int type);
+
+// # setup code runs once after boot
+void setup() {
+  Serial.begin(9600);
+  pinMode(PIN_RED, OUTPUT); // leds output light
+  pinMode(PIN_YELLOW, OUTPUT);
+  pinMode(PIN_GREEN, OUTPUT);
+
+  pinMode(PIN_BUZZER, OUTPUT); // buzzers output sound
+  // pinMODE(PIN_BUTTON, INPUT_PULLUP); // buttons input presses
+
+  if (currentPhase == 0) { // if setup properly...no previous garbage data
+    phaseRed(); // start the program as a red light
+    redStartedAt = millis();
+  } else {
+    flashStartedAt = millis(); // used for fallback. unsigned long int will overflow after ~49 days i think
+    invalidFallback = true;
+  }
+  
+}
+
+// # loop function runs after setup indefinitely (thousands of times a second)
+void loop() {
+  
+  // using millis() requires a mindset change from telling a program to stay put (delay()) to being a security guard waiting for the right time to do something (millis())
+  // i.e. state machines
+
+  // signal loop based on US traffic signals
+  // switch statement keeps this clean, only worry about one signal at a time
+  switch (currentPhase) {
+    case 0:
+      invalidFallback = false; // if the system recovers to any valid phase, set the fallback flag to false
+      if (millis() - redStartedAt >= RED_TIME) {
+        // it's time to switch to another state, switch to another state and check the time there.
+        phaseGreen();
+        currentPhase = 2;
+        greenStartedAt = millis();
+      }
+      // reaches the end = it's not time yet. repeat the loop and stay in current phase.
+      break;
+
+    case 1:
+      invalidFallback = false;
+      if (millis() - yellowStartedAt >= YELLOW_TIME) {
+        phaseRed();
+        currentPhase = 0;
+        redStartedAt = millis();
+      }
+      break;
+
+    case 2:
+      invalidFallback = false;
+      if (millis() - greenStartedAt >= GREEN_TIME) {
+        phaseYellow();
+        currentPhase = 1;
+        yellowStartedAt = millis();
+      }
+      break;
+    
+    default: // out of bounds exception (fallback to flashing red or yellow depending on signal identifier)
+      
+      // if the fallback flag is true, turn off all the pins, we'll turn on the necessary ones below
+      if (invalidFallback) {
+          digitalWrite(PIN_RED, LOW);
+          digitalWrite(PIN_YELLOW, LOW);
+          digitalWrite(PIN_GREEN, LOW);
+          digitalWrite(PIN_BUZZER, LOW);
+      }
+
+      // if the signal is a primary signal, flash yellow every second
+      // otherwise, the signal is an arterial signal, flash red every second
+      if (!isPrimarySignal) {
+        if (millis() - flashStartedAt >= FLASH_TIME) { // write to the pin directly, lowkey a good failsafe too
+          digitalWrite(PIN_RED, LOW);
+          flashStartedAt = millis(); // track trigger flash time AFTER the flip, not before
+        } else {
+          digitalWrite(PIN_RED, HIGH); // maintain a high tone
+          
+        }
+      } else {
+        if (millis() - flashStartedAt >= FLASH_TIME) { 
+          digitalWrite(PIN_YELLOW, LOW);
+          flashStartedAt = millis(); 
+        } else {
+          digitalWrite(PIN_YELLOW, HIGH);
+        }
+      }
+  }
+}
+  
+// # function definitions
+
+// buzzer ping type used for pedestrian sound cues
+/*
+void buzzerPing(int type) {
+  int ticksPerSecond = 10;
+  switch (type) {
+    case 0: // one beep per second (timer counting down)
+      digitalWrite(PIN_BUZZER, HIGH);
+      delay(125);
+      break;
+    case 1: // burst (walk sign active, 8-10 beeps per second)
+      while (ticksPerSecond > 0) {
+        digitalWrite(PIN_BUZZER, LOW);
+        delay(125);
+        digitalWrite(PIN_BUZZER, HIGH);
+        ticksPerSecond--;
+      }
+      break;
+    case 2: // end (timer terminated)
+      digitalWrite(PIN_BUZZER, HIGH);
+      delay(250);
+  }
+  digitalWrite(PIN_BUZZER, LOW); // turn off buzzer
+}
+*/
+
+// red light on
+void phaseRed() {
+  digitalWrite(PIN_RED, HIGH);   // turn on
+  digitalWrite(PIN_YELLOW, LOW); // turn off
+  digitalWrite(PIN_GREEN, LOW);  // turn off
+  
+  // sunsetted delay() for millis(), it stops the whole program just to keep the light on which is NOT good!
+  // delay(RED_TIME); // keep red light on during a period of time
+}
+
+// yellow light transition to red
+void phaseYellow() {
+  digitalWrite(PIN_RED, LOW);    // turn off red
+  digitalWrite(PIN_YELLOW, HIGH); // turn on yellow
+  digitalWrite(PIN_GREEN, LOW); // turn off green
+}
+
+// green light on
+void phaseGreen() {
+  digitalWrite(PIN_RED, LOW);    // turn off red
+  digitalWrite(PIN_YELLOW, LOW); // turn off yellow
+  digitalWrite(PIN_GREEN, HIGH); // turn on green
+}

@@ -1,0 +1,42 @@
+/*
+ * This ESP32 code is created by esp32io.com
+ *
+ * This ESP32 code is released in the public domain
+ *
+ * For more detail (instruction and wiring diagram), visit https://esp32io.com/tutorials/esp32-traffic-light
+ */
+
+#define PIN_RED    25 // The ESP32 pin GPIO25 connected to R pin of traffic light module
+#define PIN_YELLOW 26 // The ESP32 pin GPIO26 connected to Y pin of traffic light module
+#define PIN_GREEN  27 // The ESP32 pin GPIO27 connected to G pin of traffic light module
+
+#define RED_TIME     4000 // RED time in millisecond
+#define YELLOW_TIME  4000 // YELLOW time in millisecond
+#define GREEN_TIME   4000 // GREEN time in millisecond
+
+void setup() {
+  pinMode(PIN_RED, OUTPUT);
+  pinMode(PIN_YELLOW, OUTPUT);
+  pinMode(PIN_GREEN, OUTPUT);
+}
+
+// the loop function runs over and over again forever
+void loop() {
+  // red light on
+  digitalWrite(PIN_RED, HIGH);   // turn on
+  digitalWrite(PIN_YELLOW, LOW); // turn off
+  digitalWrite(PIN_GREEN, LOW);  // turn off
+  delay(RED_TIME); // keep red light on during a period of time
+
+  // yellow light on
+  digitalWrite(PIN_RED, LOW);    // turn off
+  digitalWrite(PIN_YELLOW, HIGH); // turn on
+  digitalWrite(PIN_GREEN, LOW); // turn off
+  delay(YELLOW_TIME); // keep yellow light on during a period of time
+
+  // green light on
+  digitalWrite(PIN_RED, LOW);    // turn off
+  digitalWrite(PIN_YELLOW, LOW); // turn off
+  digitalWrite(PIN_GREEN, HIGH); // turn on
+  delay(GREEN_TIME); // keep green light on during a period of time
+}

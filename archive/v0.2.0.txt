@@ -1,0 +1,115 @@
+// #include Arduino.h
+// base tutorial adapted from https://esp32io.com/tutorials/esp32-traffic-light
+
+// # constants
+// traffic light pins
+#define PIN_RED    18 // The ESP32 pin GPIO18 connected to R pin of traffic light module
+#define PIN_YELLOW 21 // The ESP32 pin GPIO21 connected to Y pin of traffic light module
+#define PIN_GREEN  22 // The ESP32 pin GPIO22 connected to G pin of traffic light module
+
+// buzzer pin (to-do: add button pin)
+#define PIN_BUZZER 19
+
+// constant timers
+#define RED_TIME     15000 // RED time in milliseconds
+#define YELLOW_TIME  4000 // YELLOW time in milliseconds
+#define GREEN_TIME   20000 // GREEN time in milliseconds
+#define RAPID_BUZZER 150
+#define NORM_BUZZER  500
+
+// unsigned long greenStartedAt;
+// unsigned long yellowStartedAt; // since yellow is 6 seconds max this is redundant
+// unsigned long redStartedAt;
+// unsigned long buzzerChangedAt = 0;
+// bool isBuzzing = false;
+
+// # function declarations
+void phaseRed();
+void phaseYellow();
+void phaseGreen();
+void buzzerPing(int type);
+
+// # setup code runs once after boot
+void setup() {
+  Serial.begin(9600);
+  pinMode(PIN_RED, OUTPUT); // leds output light
+  pinMode(PIN_YELLOW, OUTPUT);
+  pinMode(PIN_GREEN, OUTPUT);
+
+  pinMode(PIN_BUZZER, OUTPUT); // buzzers output sound
+  // pinMODE(PIN_BUTTON, INPUT_PULLUP); // buttons input presses
+
+}
+
+// # loop function runs after setup indefinitely
+void loop() {
+  // unsigned long timeNow = millis();
+  // int currentPhase; // tracks current phase (0=red,1=yellow,2=green)
+  // unsigned long greenElapsed = timeNow - greenStartedAt;
+  // unsigned long yellowElapsed = timeNow - yellowStartedAt;
+  // unsigned long redElapsed = timeNow - redStartedAt;
+
+  // signal loop based on US traffic signals
+  phaseRed();
+  // currentPhase = 0;
+  phaseGreen();
+  // currentPhase = 2;
+  phaseYellow();
+  // currentPhase = 1;
+}
+  
+// # function definitions
+
+// buzzer ping type used for pedestrian sound cues
+void buzzerPing(int type) {
+  int ticksPerSecond = 10;
+  switch (type) {
+    case 0: // one beep per second (timer counting down)
+      digitalWrite(PIN_BUZZER, HIGH);
+      delay(125);
+      break;
+    case 1: // burst (walk sign active, 8-10 beeps per second)
+      while (ticksPerSecond > 0) {
+        digitalWrite(PIN_BUZZER, LOW);
+        delay(125);
+        digitalWrite(PIN_BUZZER, HIGH);
+        ticksPerSecond--;
+      }
+      break;
+    case 2: // end (timer terminated)
+      digitalWrite(PIN_BUZZER, HIGH);
+      delay(250);
+  }
+  digitalWrite(PIN_BUZZER, LOW); // turn off buzzer
+}
+
+// red light on
+void phaseRed() {
+  digitalWrite(PIN_RED, HIGH);   // turn on
+  digitalWrite(PIN_YELLOW, LOW); // turn off
+  digitalWrite(PIN_GREEN, LOW);  // turn off
+  delay(RED_TIME); // keep red light on during a period of time
+}
+
+// yellow light transition to red
+void phaseYellow() {
+  digitalWrite(PIN_BUZZER, LOW); // turn off buzzer (from green)
+
+  digitalWrite(PIN_RED, LOW);    // turn off red
+  digitalWrite(PIN_YELLOW, HIGH); // turn on yellow
+  digitalWrite(PIN_GREEN, LOW); // turn off green
+  delay(YELLOW_TIME); // keep yellow light on during a period of time
+}
+
+// green light on
+void phaseGreen() {
+  digitalWrite(PIN_RED, LOW);    // turn off red
+  digitalWrite(PIN_YELLOW, LOW); // turn off yellow
+  digitalWrite(PIN_GREEN, HIGH); // turn on green
+
+  buzzerPing(1); // sound buzzer (burst 2x)
+  delay(1000);
+  buzzerPing(1);
+  
+  delay(GREEN_TIME); // keep green light on during a period of time
+}
