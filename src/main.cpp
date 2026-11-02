@@ -6,10 +6,14 @@
 #include <TrafficSignal.h>
 using namespace std;
 
+/* ideal setup */
+
 // you MUST declare objects outside the typical setup/loop functions for persistance
-TrafficSignal signalOne(18, 21, 22);
+TrafficSignal signalOne(18, 21, 22, false);
 
 void setup() {
+    // settings must be initialized during setup
+    // signalOne.SetCurrentPhase(3); // anything <=0 or >=2 will trigger flashing fallback
     signalOne.Initialize();
 }
 

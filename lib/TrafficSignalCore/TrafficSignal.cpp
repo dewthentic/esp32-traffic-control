@@ -1,25 +1,29 @@
 #include <Arduino.h>
 #include "TrafficSignal.h"
 
-TrafficSignal::TrafficSignal(int r, int y, int g)
+TrafficSignal::TrafficSignal(int r, int y, int g, bool isPrimary)
 {
     PIN_RED = r;
     PIN_YELLOW = y;
     PIN_GREEN = g;
 
+    // default settings
     RED_INT_TIME = 10000;
     YELLOW_INT_TIME = 3000;
     GREEN_INT_TIME = 10000;
+    IS_PRIM_SIGNAL = isPrimary;
 }
 
-TrafficSignal::TrafficSignal(int r, int y, int g, int r_time, int y_time, int g_time) {
+TrafficSignal::TrafficSignal(int r, int y, int g, bool isPrimary, int r_time, int y_time, int g_time) {
     PIN_RED = r;
     PIN_YELLOW = y;
     PIN_GREEN = g;
 
+    // custom settings
     RED_INT_TIME = r_time;
     YELLOW_INT_TIME = y_time;
     GREEN_INT_TIME = g_time;
+    IS_PRIM_SIGNAL = isPrimary;
 }
 
 void TrafficSignal::Initialize()
@@ -155,4 +159,11 @@ void TrafficSignal::GreenInterval() {
     digitalWrite(PIN_RED, LOW);    // turn off red
     digitalWrite(PIN_YELLOW, LOW); // turn off yellow
     digitalWrite(PIN_GREEN, HIGH); // turn on green
+}
+
+// [TEMPORARY] for pentesting purposes (intentional lack of bounds checking)
+// realistically this would be used for police control
+// but requires a lock flag to prevent unauthorized changes
+void TrafficSignal::SetCurrentPhase(int phase) {
+    m_currentPhase = phase;
 }

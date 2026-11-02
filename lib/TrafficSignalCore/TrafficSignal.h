@@ -9,10 +9,10 @@ class TrafficSignal {
     public:
         // TrafficSignal constructor:
         // pass the pin numbers in on object creation
-        TrafficSignal(int r, int y, int g);
+        TrafficSignal(int r, int y, int g, bool isPrimary);
         // TrafficSignal overloaded constructor
         // pass pin numbers AND interval time in advance
-        TrafficSignal(int r, int y, int g, int r_time, int y_time, int g_time);
+        TrafficSignal(int r, int y, int g, bool isPrimary, int r_time, int y_time, int g_time);
 
         // # arduino-compatible setup and loop
         void Initialize(); // equivalent to setup() in arduino
@@ -30,6 +30,7 @@ class TrafficSignal {
         void RedInterval();
         void YellowInterval();
         void GreenInterval();
+        void SetCurrentPhase(int phase);
         
 
     private:
