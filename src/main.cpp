@@ -9,7 +9,7 @@ using namespace std;
 /* ideal setup */
 
 // you MUST declare objects outside the typical setup/loop functions for persistance
-TrafficSignal signalOne(18, 21, 22, false);
+TrafficSignal signalOne(18, 21, 22, true);
 
 void setup() {
     // settings must be initialized during setup

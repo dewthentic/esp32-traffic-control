@@ -145,7 +145,7 @@ void TrafficSignal::RedInterval() {
     digitalWrite(PIN_YELLOW, LOW); // turn off
     digitalWrite(PIN_GREEN, LOW);  // turn off
   
-    // sunsetted delay() in favor of millis(), it stops the whole program just to keep the light on which is NOT good!
+    // sunsetted delay() in favor of millis(), delay() stops the whole program just to keep the light on which is NOT good!
     // delay(RED_TIME); // keep red light on during a period of time
 }
 

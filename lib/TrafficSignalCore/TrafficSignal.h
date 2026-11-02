@@ -7,7 +7,7 @@ using namespace std;
 class TrafficSignal {
 
     public:
-        // TrafficSignal constructor:
+        // TrafficSignal constructor with primary flag:
         // pass the pin numbers in on object creation
         TrafficSignal(int r, int y, int g, bool isPrimary);
         // TrafficSignal overloaded constructor
