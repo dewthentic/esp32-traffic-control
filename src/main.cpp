@@ -27,7 +27,7 @@ using namespace std;
 #define NORM_BUZZER  500
 
 // global current phase (for state machine tracking)
-int currentPhase = 3; // tracks current phase (0=red,1=yellow,2=green), must start at 0
+int currentPhase = 0; // tracks current phase (0=red,1=yellow,2=green), must start at 0
 int invalidFallback = false; // if current phase is invalid (checked during setup), turn off all pins and move to default switch case
 bool isPrimarySignal = true; // signal type identifier (0/false=arterial, 1/true=primary)
 
