@@ -13,7 +13,7 @@ TrafficSignal signalOne(18, 21, 22, true);
 
 void setup() {
     // settings must be initialized during setup
-    // signalOne.SetCurrentPhase(3); // anything <=0 or >=2 will trigger flashing fallback
+    signalOne.SetCurrentPhase(2); // anything <=0 or >=2 will trigger flashing fallback
     signalOne.Initialize();
 }
 

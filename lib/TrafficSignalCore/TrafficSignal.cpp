@@ -34,14 +34,15 @@ void TrafficSignal::Initialize()
 
     if (m_currentPhase >= 0 and m_currentPhase <= 2)
     {                  // if setup properly...no previous garbage data
+        m_currentPhase = 0; // reset the current phase before beginning to prevent erratic first cycle
         RedInterval(); // start the program as a red light
         m_redStartedAt = millis();
     }
     else
     {
-        m_currentPhase = -1;         // force into out-of-bounds to trigger default case each time
+        m_currentPhase = -1; // force into out-of-bounds to trigger default case each time (also maybe harden against overflow exploit)
         m_flashStartedAt = millis(); // used for fallback. unsigned long int will overflow after ~49 days i think
-        m_invalidFallback = true;
+        m_invalidFallback = true; // raise invalid flag (turns off all lights)
     }
 }
 

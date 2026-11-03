@@ -8,14 +8,24 @@ using namespace std;
 // traffic signal changes phases after button is pushed
 // provided the minimum time (of the phase) has passed
 
+// adapted from https://esp32io.com/tutorials/esp32-button into a class
+
 class PED_Button {
 
     public:
         PED_Button(int buttonPin);
+        void Initialize();
+        void Update();
 
     private:
-        unsigned long m_buttonPressedAt = 0;
-        bool m_isPressed = false;
+        int PIN_BUTTON;
+        unsigned long m_buttonPressedAt = 0; // millis()
+        
+        // tracking button state without micro oscillation effect
+        int m_lastState = 0;
+        int m_currentState = 0;
+
+        int m_amtPressed = 0; // used for the WAIT
 
 };
 
