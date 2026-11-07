@@ -47,6 +47,9 @@ class TrafficSignal {
         unsigned int YELLOW_INT_TIME;
         unsigned int GREEN_INT_TIME;
 
+        // unsigned int MIN_RED_INT;
+        // unsigned int MIN_GREEN_INT;
+
         // used for fallback flashing 
         // (red or yellow depending on primary signal bool)
         int FLASH_INT_TIME = 500;

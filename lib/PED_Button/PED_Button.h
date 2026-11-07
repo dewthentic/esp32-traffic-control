@@ -19,10 +19,13 @@ class PED_Button {
 
     private:
         int PIN_BUTTON;
-        unsigned long m_buttonPressedAt = 0; // millis()
+        const int DEBOUNCE_TIME = 50; // time to wait after a button press (in ms)
+        // unsigned long m_buttonPressedAt = 0; // millis()
+        unsigned long m_lastDebounceTime = 0; // the last time the output pin was toggled
         
         // tracking button state without micro oscillation effect
-        int m_lastState = 0;
+        int m_lastSteadyState = 0;
+        int m_lastFlickerState = 0;
         int m_currentState = 0;
 
         int m_amtPressed = 0; // used for the WAIT
