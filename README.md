@@ -13,6 +13,7 @@ Below, you may find documentation on the project and how the project works on th
 
 ## Table of Contents
 
+- [AI Statement](#ai-statement)
 - [Installation](#installation)
 - [Usage](#usage)
   - [Basic Setup](#basic-setup)
