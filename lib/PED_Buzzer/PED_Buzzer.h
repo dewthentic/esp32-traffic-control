@@ -11,33 +11,40 @@ using namespace std;
 class PED_Buzzer {
 
     public:
-        PED_Buzzer(int buzzerPin);
+        PED_Buzzer();
+        // PED_Buzzer(int buzzerPin);
         void Initialize();
         void Update();
+        void ChangeState(int state);
         void TriggerPing(); // one beep per second
-        void TriggerBurst(); // 8-10 beeps per second with pause
+        void TriggerBurst(int amt); // 8-10 beeps per second with pause
 
     private:
         // state and mode tracking
-        enum BuzzerState {OFF, BURST, COUNTDOWN, AUTO};
+        enum BuzzerState {OFF, BURST, COUNTDOWN, IDLE};
         BuzzerState m_currentState = OFF;
 
         // timing variables
+        unsigned long m_buzzerStartedAt = 0; // 
         unsigned long m_nextEventTime = 0; // absolute deadline (millis() + interval) for when the next ping or burst plays
         unsigned long m_pulseOffTime = 0; // absolute time when an active beep (HIGH) must stop (LOW)
 
-        // constants (configuration)
+        // configuration (constants)
         const int BURST_INTERVAL = 111; // time in ms between burst pings (~9 pings per second)
         const int COUNT_INTERVAL = 1000; // time in ms between one second beeps (1 ping per second)
         const int PULSE_DURATION = 40; // time in ms the buzzer stays active (beeping)
 
+        // configuration (variables)
+        int m_isBuzzing = false;
+        int m_accessibilityMode = true;
+        int m_countdownTime = 0; // used for ping and burst
+        int PIN_BUZZER; // buzzer pin
+
         // private helper functions
         void BurstHandler();
-        void CountHandler();
+        void PingHandler();
 
-        unsigned long m_buzzerTriggeredAt = 0;
-        int m_isBuzzing = false;
-        int PIN_BUZZER; // buzzer pin
+        
 };
 
 #endif

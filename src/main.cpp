@@ -7,6 +7,7 @@
 using namespace std;
 
 /* ideal setup */
+// we don't use int main/return 0 in here because it loops repeatedly
 
 // you MUST declare objects outside the typical setup/loop functions for persistance
 TrafficSignal signalOne(18, 21, 22, true);

@@ -2,6 +2,8 @@
 #define TRAFFIC_SIGNAL
 
 #include <Arduino.h>
+#include "PED_Buzzer.h"
+#include "PED_Button.h"
 using namespace std;
 
 class TrafficSignal {
@@ -65,6 +67,10 @@ class TrafficSignal {
         int m_currentPhase;
         bool m_invalidFallback;
         bool IS_PRIM_SIGNAL;
+
+        // composition (has-a) object declarations
+        PED_Buzzer m_buzzer; // make a buzzer with pin 25
+        // PED_Button m_pedButton; // not ready yet
 
 };
 

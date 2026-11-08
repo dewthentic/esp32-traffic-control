@@ -13,6 +13,7 @@ using namespace std;
 class PED_Button {
 
     public:
+        PED_Button();
         PED_Button(int buttonPin);
         void Initialize();
         void Update();

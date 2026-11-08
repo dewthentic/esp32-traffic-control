@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include "TrafficSignal.h"
+#include "PED_Buzzer.h"
 
 TrafficSignal::TrafficSignal(int r, int y, int g, bool isPrimary)
 {
@@ -12,6 +13,7 @@ TrafficSignal::TrafficSignal(int r, int y, int g, bool isPrimary)
     YELLOW_INT_TIME = 3000;
     GREEN_INT_TIME = 10000;
     IS_PRIM_SIGNAL = isPrimary;
+
 }
 
 TrafficSignal::TrafficSignal(int r, int y, int g, bool isPrimary, int r_time, int y_time, int g_time) {
@@ -32,6 +34,9 @@ void TrafficSignal::Initialize()
     pinMode(PIN_YELLOW, OUTPUT);
     pinMode(PIN_GREEN, OUTPUT);
 
+    m_buzzer.Initialize();
+    m_buzzer.ChangeState(0); // buzzer is off
+
     if (m_currentPhase >= 0 and m_currentPhase <= 2)
     {                  // if setup properly...no previous garbage data
         m_currentPhase = 0; // reset the current phase before beginning to prevent erratic first cycle
@@ -50,6 +55,8 @@ void TrafficSignal::Update()
 {
     // using millis() requires a mindset change from telling a program to stay put (delay()) to being a security guard waiting for the right time to do something (millis())
     // i.e. state machines
+    
+    m_buzzer.Update(); // all has-a objects must also be updated
 
     // signal loop based on US traffic signals
     // switch statement keeps this clean, only worry about one signal at a time
@@ -61,6 +68,7 @@ void TrafficSignal::Update()
             {
                 // it's time to switch to another state, switch to another state and check the time there.
                 GreenInterval();
+                m_buzzer.ChangeState(3);
                 m_currentPhase = 2;
                 m_greenStartedAt = millis();
             }
@@ -82,6 +90,7 @@ void TrafficSignal::Update()
             if (millis() - m_greenStartedAt >= GREEN_INT_TIME)
             {
                 YellowInterval();
+                m_buzzer.ChangeState(0);
                 m_currentPhase = 1;
                 m_yellowStartedAt = millis();
             }
