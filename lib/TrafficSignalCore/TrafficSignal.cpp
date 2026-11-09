@@ -35,7 +35,7 @@ void TrafficSignal::Initialize()
     pinMode(PIN_GREEN, OUTPUT);
 
     m_buzzer.Initialize();
-    m_buzzer.ChangeState(0); // buzzer is off
+    m_buzzer.ChangeState(2); // buzzer is pinging once per second by default
 
     if (m_currentPhase >= 0 and m_currentPhase <= 2)
     {                  // if setup properly...no previous garbage data
@@ -68,7 +68,7 @@ void TrafficSignal::Update()
             {
                 // it's time to switch to another state, switch to another state and check the time there.
                 GreenInterval();
-                m_buzzer.ChangeState(3);
+                m_buzzer.ChangeState(1); // start on walk start
                 m_currentPhase = 2;
                 m_greenStartedAt = millis();
             }
@@ -90,7 +90,7 @@ void TrafficSignal::Update()
             if (millis() - m_greenStartedAt >= GREEN_INT_TIME)
             {
                 YellowInterval();
-                m_buzzer.ChangeState(0);
+                // m_buzzer.ChangeState(0); // uncomment only if you want the pinging to stop when phase ends
                 m_currentPhase = 1;
                 m_yellowStartedAt = millis();
             }

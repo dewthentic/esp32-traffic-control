@@ -13,8 +13,8 @@ PED_Buzzer::PED_Buzzer(int buzzerPin) {
 
 void PED_Buzzer::Initialize() {
     pinMode(PIN_BUZZER, OUTPUT); // [BUG FIX] Added pinMode initialization so the pin actually drives current.
-    m_isBuzzing = false;
     m_currentState = OFF;        // [BUG FIX] Explicitly initialize state on startup.
+
 }
 
 void PED_Buzzer::Update() {
@@ -31,28 +31,30 @@ void PED_Buzzer::Update() {
 
 // allows external functions to change the state of the buzzer
 void PED_Buzzer::ChangeState(int state) {
-    // bounds checking on requested state
-    // we won't trigger functions here, 
-    // update() is responsible for listening
     switch (state) {
         case 0:
             m_currentState = OFF;
-            digitalWrite(PIN_BUZZER, LOW); // [OPTIMIZATION] Ensure buzzer turns off immediately on state switch.
+            noTone(PIN_BUZZER); // [FIX] Instantly stop any active tone when turning off
             break;
         case 1:
             m_currentState = BURST;
-            m_nextEventTime = millis();    // [BUG FIX] Reset timer so the first burst tick fires immediately.
+            noTone(PIN_BUZZER); // [FIX] Clear any residual tone before starting burst
+            m_nextEventTime = millis();    
+            m_burstStartedAt = millis(); 
+            m_burstCycleCt = 0; 
+            m_isBurstActive = true; 
             break;
         case 2:
             m_currentState = COUNTDOWN;
-            m_nextEventTime = millis();    // [BUG FIX] Reset timer so the first countdown ping fires immediately.
+            noTone(PIN_BUZZER); // [FIX] Clear residual tone before starting countdown pings
+            m_nextEventTime = millis();    
             break;
         case 3:
             m_currentState = IDLE;
-            m_nextEventTime = millis();    // [BUG FIX] Reset timer for immediate IDLE pinging.
+            noTone(PIN_BUZZER); // [FIX] Clear residual tone for IDLE state
+            m_nextEventTime = millis();    
             break;
         default:
-            // keep the current state
             break;
     }
 }
@@ -70,8 +72,7 @@ void PED_Buzzer::TriggerPing() {
 void PED_Buzzer::TriggerBurst(int amt) {
     // [NOTE ON METHOD]: Instead of a blocking loop or single-fire call, 
     // delegate state management to ChangeState() and let Update() drive the timing.
-    ChangeState(1); 
-    
+    ChangeState(1);
     // [NOTE ON 'amt']: If you want to limit the burst to a specific count ('amt'), 
     // store 'amt' in a private member variable and decrement it inside BurstHandler().
 }
@@ -80,6 +81,46 @@ void PED_Buzzer::TriggerBurst(int amt) {
 void PED_Buzzer::BurstHandler() {
     unsigned long currentMillis = millis();
 
+    if (m_burstCycleCt >= MAX_BURSTS) {
+        noTone(PIN_BUZZER); // Stop sound completely
+        ChangeState(2);
+        return;
+    }
+
+    if (m_isBurstActive) {
+        if (currentMillis - m_burstTimer >= BURST_ACTIVE_INT) {
+            noTone(PIN_BUZZER); 
+            m_isBurstActive = false; 
+            m_burstTimer = currentMillis; 
+            return;
+        }
+
+        // Fire 800 Hz tone tick
+        if (currentMillis >= m_nextEventTime) {
+            tone(PIN_BUZZER, 800); // Generate 800 Hz square wave
+            m_buzzerStartedAt = currentMillis;
+            m_pulseOffTime = m_buzzerStartedAt + PULSE_DURATION;
+            m_nextEventTime += BURST_INTERVAL;
+        }
+
+        // Stop the short beep after PULSE_DURATION (e.g., 40ms)
+        if (m_pulseOffTime > 0 && currentMillis >= m_pulseOffTime) {
+            noTone(PIN_BUZZER);
+            m_pulseOffTime = 0;
+        }
+    } else {
+        noTone(PIN_BUZZER);
+        
+        if (currentMillis - m_burstTimer >= BURST_PAUSE_INT) {
+            m_burstCycleCt++;          
+            m_isBurstActive = true;       
+            m_burstTimer = currentMillis; 
+            m_nextEventTime = currentMillis; 
+        }
+    }
+}
+
+    /*
     // 1. Time to turn the beep ON
     if (currentMillis >= m_nextEventTime) {
         digitalWrite(PIN_BUZZER, HIGH);
@@ -98,24 +139,20 @@ void PED_Buzzer::BurstHandler() {
         digitalWrite(PIN_BUZZER, LOW);
         m_pulseOffTime = 0; // Prevent re-triggering this block until the next pulse starts
     }
-}
+    */
 
 void PED_Buzzer::PingHandler() {
     unsigned long currentMillis = millis();
 
-    // 1. Time to turn the ping ON
     if (currentMillis >= m_nextEventTime) {
-        digitalWrite(PIN_BUZZER, HIGH);
+        tone(PIN_BUZZER, 800); // 800 Hz single beep
         m_buzzerStartedAt = currentMillis;
         m_pulseOffTime = m_buzzerStartedAt + PULSE_DURATION;
-        
-        // [BUG FIX]: Use rolling target addition (+=) for 1-second countdown intervals.
         m_nextEventTime += COUNT_INTERVAL; 
     }
     
-    // 2. Time to turn the ping OFF
     if (m_pulseOffTime > 0 && currentMillis >= m_pulseOffTime) {
-        digitalWrite(PIN_BUZZER, LOW);
-        m_pulseOffTime = 0; // Reset off-time tracker until next cycle
+        noTone(PIN_BUZZER);
+        m_pulseOffTime = 0; 
     }
 }
