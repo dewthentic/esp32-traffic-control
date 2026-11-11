@@ -1,4 +1,4 @@
-# TraffiControl on ESP32
+# ESP32 Traffic Control
 
 ## Overview
 
