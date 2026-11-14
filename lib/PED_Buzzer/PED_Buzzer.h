@@ -37,7 +37,7 @@ class PED_Buzzer {
         
         const int MAX_BURSTS = 3; // customizable number of bursts for each signal (take into account intersection size)
         const int BURST_PAUSE_INT = 500; // delay time (low) after one burst wave finishes
-        const int BURST_ACTIVE_INT = 1000; // total time an active burst should take
+        const int BURST_ACTIVE_INT = 2000; // total time an active burst should take
 
         // configuration (variables)
         unsigned long m_burstTimer = 0; // true = rapid ticks, false = silent pause
@@ -50,6 +50,9 @@ class PED_Buzzer {
         // private helper functions
         void BurstHandler();
         void PingHandler();
+        // void ChangeActiveBurstInt();
+        // void ChangePassiveBurstInt();
+        // void ChangeMaxBursts();
 
         
 };

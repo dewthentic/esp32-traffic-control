@@ -2,7 +2,8 @@
 #include <Arduino.h> // Ensure Arduino core functions like digitalWrite and millis are available
 
 PED_Buzzer::PED_Buzzer() {
-    PIN_BUZZER = 25;
+    PIN_BUZZER = 18; // for ease it's declared here
+    // but in the future i have to make a setup configuration
 }
 
 /*
