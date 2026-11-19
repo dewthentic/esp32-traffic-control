@@ -8,9 +8,11 @@ using namespace std;
 class Intersection {
     // create an intersection with one signal
     // real life application (metered highway entry e.g. I-270, I-66)
-    Intersection();
+    // Intersection();
+
     // create an intersection with two signals
     Intersection(TrafficSignal signalOne, TrafficSignal signalTwo);
+
     // create an intersection with three signals
     Intersection();
 

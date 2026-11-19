@@ -2,6 +2,17 @@
 #include "TrafficSignal.h"
 #include "PED_Buzzer.h"
 
+/*
+// NOTE: 
+the timing and fallback triggers in the traffic signal class
+will be moved to the intersection class
+
+traffic signal classes will retain the core ability
+to change to different phases
+they will just no longer track timing. intersection.cpp
+will do that instead
+*/
+
 TrafficSignal::TrafficSignal(int r, int y, int g, bool isPrimary)
 {
     PIN_RED = r;
@@ -35,7 +46,8 @@ void TrafficSignal::Initialize()
     pinMode(PIN_GREEN, OUTPUT);
 
     m_buzzer.Initialize();
-    m_buzzer.ChangeState(2); // buzzer is pinging once per second by default
+    // m_buzzer.ChangeState(2); // buzzer is pinging once per second by default
+    m_buzzer.ChangeState(0); // buzzer is OFF
 
     if (m_currentPhase >= 0 and m_currentPhase <= 2)
     {                  // if setup properly...no previous garbage data
