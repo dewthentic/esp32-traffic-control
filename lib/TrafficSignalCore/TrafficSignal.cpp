@@ -45,9 +45,10 @@ void TrafficSignal::Initialize()
     pinMode(PIN_YELLOW, OUTPUT);
     pinMode(PIN_GREEN, OUTPUT);
 
-    m_buzzer.Initialize();
+    // will be moved to intersection. an intersection has a buzzer, not a traffic light
+    // m_buzzer.Initialize();
     // m_buzzer.ChangeState(2); // buzzer is pinging once per second by default
-    m_buzzer.ChangeState(0); // buzzer is OFF
+    // m_buzzer.ChangeState(0); // buzzer is OFF
 
     if (m_currentPhase >= 0 and m_currentPhase <= 2)
     {                  // if setup properly...no previous garbage data
@@ -68,7 +69,7 @@ void TrafficSignal::Update()
     // using millis() requires a mindset change from telling a program to stay put (delay()) to being a security guard waiting for the right time to do something (millis())
     // i.e. state machines
     
-    m_buzzer.Update(); // all has-a objects must also be updated
+    // m_buzzer.Update(); // all has-a objects must also be updated
 
     // signal loop based on US traffic signals
     // switch statement keeps this clean, only worry about one signal at a time
@@ -80,7 +81,7 @@ void TrafficSignal::Update()
             {
                 // it's time to switch to another state, switch to another state and check the time there.
                 GreenInterval();
-                m_buzzer.ChangeState(1); // start on walk start
+                // m_buzzer.ChangeState(1); // start on walk start
                 m_currentPhase = 2;
                 m_greenStartedAt = millis();
             }

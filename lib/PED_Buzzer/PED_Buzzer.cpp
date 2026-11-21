@@ -121,27 +121,6 @@ void PED_Buzzer::BurstHandler() {
     }
 }
 
-    /*
-    // 1. Time to turn the beep ON
-    if (currentMillis >= m_nextEventTime) {
-        digitalWrite(PIN_BUZZER, HIGH);
-        m_buzzerStartedAt = currentMillis;
-        m_pulseOffTime = m_buzzerStartedAt + PULSE_DURATION;
-        
-        // [BUG FIX / OPTIMIZATION]: Advance the deadline immediately upon firing 
-        // using the rolling target method (+=) to prevent timing drift.
-        m_nextEventTime += BURST_INTERVAL; 
-    }
-    
-    // 2. Time to turn the beep OFF
-    // [BUG FIX]: Added a safeguard (like checking if pulse is active or resetting m_pulseOffTime) 
-    // so this block doesn't repeatedly execute across multiple loop cycles and mess up timing.
-    if (m_pulseOffTime > 0 && currentMillis >= m_pulseOffTime) {
-        digitalWrite(PIN_BUZZER, LOW);
-        m_pulseOffTime = 0; // Prevent re-triggering this block until the next pulse starts
-    }
-    */
-
 void PED_Buzzer::PingHandler() {
     unsigned long currentMillis = millis();
 

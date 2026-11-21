@@ -15,8 +15,8 @@ TrafficSignal signalTwo(15, 4, 5, false, 15000, 5000, 30000);
 
 void setup() {
     // settings must be initialized during setup
-    signalOne.SetCurrentPhase(5); // anything <=0 or >=2 will trigger flashing fallback
-    signalTwo.SetCurrentPhase(4); // not yet ready (one buzzer on two signals is not good)
+    signalOne.SetCurrentPhase(4); // anything <=0 or >=2 will trigger flashing fallback
+    signalTwo.SetCurrentPhase(1); // not yet ready (one buzzer on two signals is not good)
     signalOne.Initialize();
     signalTwo.Initialize();
 }

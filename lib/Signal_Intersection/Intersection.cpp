@@ -22,8 +22,10 @@ so we'll phase out the traffic signal millis timing there and bring it
 into here.
 
 replace the traffic signal phase changing with individual phase changes
-(e.g. trafficsignal.turnred();)
+(e.g. signalOne.TurnRed(); called from the intersection class would
+trigger signalOne to turn red)
 
+256 128 64 32 16 8 4 2 1
 
 */
 
